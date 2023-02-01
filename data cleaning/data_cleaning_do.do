@@ -76,7 +76,8 @@ tab insomnia, missing
 		recode insomnia_main (3 = 1) (1 = 0) (2 = 0)
 		*Add value labels
 		label define insomnia_main_lab 1 "Usually" 0 "Never/sometimes"
-		label values 
+		label values insomnia_main insomnia_main_lab
+		tab insomnia_main
 	
 	
 	*2. To be used in sensitivity analysis. 0 if never. 1 if usually/sometimes.
