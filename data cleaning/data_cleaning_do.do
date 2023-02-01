@@ -1,5 +1,6 @@
 *Data cleaning phenotype data
 **************************************
+**************************************
 
 *Open phenotype data
 use "insomnia_pheno.dta"
@@ -55,3 +56,38 @@ label variable nap "nap during the day category (1190)"
 label variable day_dozing "daytime dozing/sleeping when don't mean to category (1220)"
 label variable household_no "number of people in household category (709)"
 
+******************************************************************************************
+
+**Do I need to convert string variables to numeric?
+*If so do: destring *, replace ignore("NA")
+
+*Clean insomnia variable
+	*Set 'prefer not to answer' (-3) as missing & add value labels.
+tab insomnia, missing
+recode insomnia (-3 = .)
+tab insomnia, missing 
+	
+*Generate 2 new insomnia variables to be used in analyses.
+	*1. To be used in main analysis. 0 if never/sometimes. 1 if usually
+		*Generate new variable
+		gen insomnia_main = insomnia 
+		tab insomnia_main, missing
+		*Recode categories
+		recode insomnia_main (3 = 1) (1 = 0) (2 = 0)
+		*Add value labels
+		label define insomnia_main_lab 1 "Usually" 0 "Never/sometimes"
+		label values 
+	
+	
+	*2. To be used in sensitivity analysis. 0 if never. 1 if usually/sometimes.
+	
+		*Add value labels
+	
+	*Add value labels
+	label define insomnia_sens_lab 	
+	
+*Save as different file name
+
+
+*Upload to DNA Nexus repository
+	
