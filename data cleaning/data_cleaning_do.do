@@ -1,10 +1,13 @@
-*Data cleaning phenotype data
+*DATA CLEANINING - PHENOTYPE DATA
 **************************************
 **************************************
 
 *Open phenotype data
-use "insomnia_pheno.dta"
+use insomnia_pheno.dta, clear
 describe
+
+***************************************************************
+*Renaming & labelling variables
 
 *Rename variables
 
@@ -31,6 +34,8 @@ rename v21 nap
 rename v22 day_dozing
 rename v23 household_no
 
+describe
+
 *Relabel variables
 label variable eid "participant id"
 label variable sex "sex at recruitment category (31)"
@@ -47,7 +52,7 @@ label variable worrier "are a worrier category (1980)"
 label variable depress "frequency depressed mood past 2 weeks category (2050)"
 label variable employ "current employment status category (6142)"
 label variable quals "qualification have (can choose >1) category (6138)"
-label variable household_relations "how others in household are related to participant (can choose >1) category (6141)"
+label variable household_relations "how others in household related to participant (can choose >1) category (6141)"
 label variable pop_dens "home area population density category (20118)"
 label variable night_shift "job involves night shift work category (3426)"
 label variable sleep_dur "sleep duration in hours (inc naps) category (1160)"
@@ -56,10 +61,11 @@ label variable nap "nap during the day category (1190)"
 label variable day_dozing "daytime dozing/sleeping when don't mean to category (1220)"
 label variable household_no "number of people in household category (709)"
 
-******************************************************************************************
+*Check naming & labeling
+describe
 
-**Do I need to convert string variables to numeric?
-*If so do: destring *, replace ignore("NA")
+******************************************************************************************
+*Clean & generate insomnia variables
 
 *Clean insomnia variable
 	*Set 'prefer not to answer' (-3) as missing & add value labels.
@@ -72,23 +78,35 @@ tab insomnia, missing
 		*Generate new variable
 		gen insomnia_main = insomnia 
 		tab insomnia_main, missing
-		*Recode categories
-		recode insomnia_main (3 = 1) (1 = 0) (2 = 0)
+		label variable insomnia_main "Insomnia for main analyses. 1= usually 0=sometimes & never/rarely"
+		*Recode categories (previously 3 = usually, 2 = sometimes, 1 = never/rarely)
+		recode insomnia_main (3 = 1) (2 = 0) (1 = 0)
 		*Add value labels
-		label define insomnia_main_lab 1 "Usually" 0 "Never/sometimes"
-		label values insomnia_main insomnia_main_lab
-		tab insomnia_main
+		label define insomnia_lab 1 "Yes" 0 "No"
+		label values insomnia_main insomnia_lab
+		tab insomnia_main, missing
 	
 	
 	*2. To be used in sensitivity analysis. 0 if never. 1 if usually/sometimes.
-	
+		*Generate new variable
+		gen insomnia_sens = insomnia 
+		tab insomnia_sens, missing
+		label variable insomnia_sens "Insomnia for sensitivity analyses. 1= usually & sometimes 0=never/rarely"
+		*Recode categories (previously 3 = usually, 2 = sometimes, 1 = never/rarely)
+		recode insomnia_sens (3 = 1) (2 = 1) (1 = 0)
 		*Add value labels
-	
-	*Add value labels
-	label define insomnia_sens_lab 	
+		label values insomnia_sens insomnia_lab
+		tab insomnia_sens, missing
+		
+*Check insomnia variables look ok
+describe
+codebook insomnia_main
+codebook insomnia_sens
+
+*****************************************************************************************
 	
 *Save as different file name
-
+save insomnia_pheno_cleaned.dta, replace
 
 *Upload to DNA Nexus repository
-	
+!dx upload insomnia_pheno_cleaned.dta
