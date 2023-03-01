@@ -37,7 +37,12 @@
 	* Investigate duplicates and delete if genuine duplicates
 	ssc install unique
 		unique readcode //n unique values = 181. n records = 255. 
-*UK Biobank data dictionary has different //descriptions for the same code, hence we have duplicate codes but the wording of the descriptions is slightly different. 
+*UK Biobank data dictionary has duplicate read codes with different descriptions for the same code. First occurence of code incorporates subsequent descriptions. e.g. 1st occurence of code: insomnia & somnolesence. 2nd occurence: insomnia. 3rd occurence: somnolesence. Therefore we will remove all duplicates except the first occurence. 
+	browse
+	
+	duplicates list readcode
+	duplicates drop readcode, force //74 observations deleted
+	count //181
 	browse
 	
 **********************************************************
@@ -64,7 +69,7 @@ restore
 preserve
 drop if keep!=1
 count
-unique readcode //n unique values = 111. n records = 148.
+unique readcode //n unique values = 107. n records = 107.
 
 keep readcode desc
 
