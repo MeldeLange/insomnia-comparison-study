@@ -53,36 +53,17 @@
 	browse
 	
 **********************************************************
-**Save broader codelist ready to use in data cleaning
+**Save codelist ready to use in data cleaning
 rename Readtermdescription desc
-
 
 save "$insomniacodesdir\insomnia_checkedcodelists.dta", replace
 
-preserve
 
 keep readcode desc
 
 
-save "$insomniacodesdir\insomniabroad_finalcodelist.dta", replace
+save "$insomniacodesdir\insomnia_finalcodelist.dta", replace
 
-
-
-*Save narrower codelist ready to use in data cleaning
-
-restore
-
-
-preserve
-drop if keep!=1
-count
-unique readcode //n unique values = 107. n records = 107.
-
-keep readcode desc
-
-save "$insomniacodesdir\insomnianarrow_finalcodelist.dta", replace
-
-restore
 
 *****************************************************************************************************************
 
