@@ -58,3 +58,6 @@ save pc_events_cleaned.dta, replace
 *Upload to DNA Nexus repository
 !dx upload pc_events_cleaned.dta
 
+*See how many eids we have
+unique eid //No of unique values: 165145. No of records is 87,468,188
+
