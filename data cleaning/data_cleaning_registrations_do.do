@@ -3,11 +3,12 @@
 
 *Import primary care registrations/deductions csv file
 import delimited /mnt/project/primarycare_registrations.csv, clear
-describe
+describe //634,928 obs
 list in 1/5
+*Variables: eid, reg_date, deduct_date, data_provider
 
 *Save phenotype data as stata .dta file
-save primarycare_registrations
+save primarycare_registrations, replace
 
 *Upload saved .dta file to project in DNA Nexus
 !dx upload primarycare_registrations.dta
@@ -25,14 +26,13 @@ describe
 list in 1/5
 
 *Drop all observations that don't have England-TPP as the data provider
-***Didn't do this - don't have data provider in dataset as will merge with pc event data that has been cut down to 
-*just event provider 3 (TPP)
-*keep if data_provider == //Need to check value of TPP. 3?
-*drop data_provider
+keep if data_provider == 3 //388,694 observations deleted
+count //246,234
+drop data_provider
 
 *Convert registration date and deduction date from string to stata elapsed date format
-generate reg_date_stata = date(reg_date, "YMD")
-generate deduct_date_stata = date(deduct_date, "YMD")
+generate reg_date_stata = date(reg_date, "YMD") //7 missing values generated
+generate deduct_date_stata = date(deduct_date, "YMD") //145,493 missing values generated
 list eid reg_date reg_date_stata deduct_date deduct_date_stata in 1/5
 	*Make elapsed date readable
 	format reg_date_stata %d
@@ -64,4 +64,9 @@ save pc_regs_wide.dta, replace
 
 *Upload to DNA Nexus repository
 !dx upload pc_regs_wide.dta
+
+
+*Count number of unique eids
+ssc install unique
+unique eid // Unique values of eid: 164190. Number of records: 164190
 
