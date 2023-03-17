@@ -1,22 +1,48 @@
 *DATA CLEANING - PRIMARY CARE EVENT DATA
 ************************************************************
 
-*Open primary care event data
-use primarycare_events.dta, clear
+*Import primary care events csv file
+import delimited /mnt/project/primarycare_events.csv, clear
 describe
 list in 1/5
 
-*Rename read code variable so numbering doesn't get confused when reshaped
+*Save phenotype data as stata .dta file
+save primarycare_events
+
+*Upload saved .dta file to project in DNA Nexus
+!dx upload primarycare_events.dta
+
+
+*************************************************************************************
+**************************************************************************************
+***Need to go out of JupyterLab and then back in again to use .dta file saved in DNA Nexus project
+
+
+*Open primary care event data
+use /mnt/project/primarycare_events.dta, clear
+describe
+list in 1/5
+
+*Rename read code variable
 rename read_3 read_code
+list in 1/5
 
 *Drop all observations that don't have England-TPP as the data provider
-keep if data_provider == //Need to check value of TPP. 3?
+count //123,908,327
+tab data_provider
+codebook data_provider
+keep if data_provider == 3 //36,440,139 observations deleted
+count //87,468,188
+list in 1/5
 drop data_provider
+list in 1/5
+
 
 *Convert event date from string to stata elapsed date format
 generate event_date_stata = date(event_dt, "YMD")
 list eid event_dt event_date_stata in 1/5
-	*Make elapsed date readable
+
+*Make elapsed date readable
 	format event_date_stata %d
 	list eid event_dt event_date_stata in 1/5
 
@@ -24,23 +50,11 @@ list eid event_dt event_date_stata in 1/5
 drop event_dt
 rename event_date_stata event_date
 list in 1/5
+describe
 
-
-*Generate eventno variable to use when reshaping data
-sort eid event_date read_code
-list in 1/5
-egen eventno = seq(), by (eid)
-
-
-
-*Reshape from long to wide format
-reshape wide event_date read_code, i(eid) j(eventno)
-list in 1/5
-
-
-*Save primary care event data ready to merge with primary care registrations/deductions data
-save pc_events_wide.dta, replace
+*Save primary care event data (long format) ready to merge with primary care registrations/deductions data (wide format)
+save pc_events_cleaned.dta, replace
 
 *Upload to DNA Nexus repository
-!dx upload pc_events_wide.dta
+!dx upload pc_events_cleaned.dta
 
