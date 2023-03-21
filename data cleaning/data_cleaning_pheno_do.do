@@ -20,7 +20,7 @@ save insomnia_pheno
 
 
 *Open phenotype data
-use "insomnia_pheno.dta"
+use /mnt/project/insomnia_pheno.dta, clear
 describe
 
 ***************************************************************
@@ -54,6 +54,9 @@ rename v24 alcohol
 rename v25 smoking
 rename v26 risk
 rename v27 quals
+rename v28 met_mins
+rename v29 coffee
+rename v30 tea
 
 describe
 
@@ -85,6 +88,9 @@ label variable menopause "had menopause (2724)"
 label variable alcohol "alcohol intake frequency (1558)"
 label variable smoking "smoking status (20116)"
 label variable risk "risk taking (2040)"
+label variable met_mins "total met mins/week for all activity (22040)"
+label variable coffee "coffee intake (cups per day) (1498)"
+label variable risk "tea intake (cups per day) (1488)"
 
 *Check naming & labeling
 describe
