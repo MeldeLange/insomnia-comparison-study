@@ -7,7 +7,7 @@ describe //634,928 obs
 list in 1/5
 *Variables: eid, reg_date, deduct_date, data_provider
 
-*Save phenotype data as stata .dta file
+*Save primary care registration data as stata .dta file
 save primarycare_registrations, replace
 
 *Upload saved .dta file to project in DNA Nexus
