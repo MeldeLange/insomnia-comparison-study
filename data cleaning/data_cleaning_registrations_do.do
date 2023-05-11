@@ -7,7 +7,7 @@ describe //634,928 obs
 list in 1/5
 *Variables: eid, reg_date, deduct_date, data_provider
 
-*Save primary care registration data as stata .dta file
+*Save phenotype data as stata .dta file
 save primarycare_registrations, replace
 
 *Upload saved .dta file to project in DNA Nexus
@@ -96,4 +96,80 @@ save pc_regs_wide.dta, replace
 !dx upload pc_regs_wide.dta
 
 
+***************************************************************************************************************************************
+*Add (merge) date of assessment centre variable to registration dataset so that we can cut any events after the data of assessment centre.
+***************************************************************************************************************************************
+*Open insomnia phenotype data & drop everything except eid and date of assessment.
 
+	*Install unique
+	ssc install unique
+
+	*Open phenotype data
+	use /mnt/project/insomnia_pheno_cleaned.dta, clear
+	describe //31 vars
+	unique eid //unique eid: 502,387. recods: 502,387.
+	list in 1/5
+
+	*Keep eid & date of assessment
+	keep eid date_assess
+	describe //2 vars. date_assess: str10
+
+	*Save & upload file
+	save date_asess.dta, replace
+	!dx upload date_asess.dta
+
+*Merge registration data with date of assessment data
+
+	*Go back out & in to jupyterlabs.
+	
+	*Open registration data
+	use /mnt/project/pc_regs_wide.dta, clear
+	set more off
+	describe // obs: 164,184. vars: 121
+	ssc install unique
+	unique eid // eid: 164,184. records: 164,184
+	list in 1/5
+	
+	*Merge with data of assessment data
+	merge 1:1 eid using /mnt/project/date_asess.dta
+	describe //obs: 502,387. vars: 123
+	unique eid // eid & records: 502,387
+	list in 1/1
+	tab _merge
+	
+*	 Result                           # of obs.
+*    -----------------------------------------
+*    not matched                       338,203
+*        from master                         0  (_merge==1)
+*        from using                    338,203  (_merge==2)
+*
+*    matched                           164,184  (_merge==3)
+*    -----------------------------------------
+	
+*Drop people without registration data.
+drop if _merge ==2 //338,203 obs deleted.
+describe // obs: 164,184. vars: 123.
+
+*Don't need to drop people without date of assessment variable as no-one is missing this variable.
+
+*Drop merge variable
+drop _merge
+
+*Format date of assessment variable so can be read by stata
+	
+	*Convert date of assessment centre from string to stata elapsed date format
+	generate date_assess_stata = date(date_assess, "YMD")
+	list eid date_assess date_assess_stata in 1/5
+	
+	*Make elapsed date readable
+	format date_assess_stata %d
+	list eid date_assess date_assess_stata in 1/5
+	
+	*Rename variable back to original name
+	drop date_assess
+	rename date_assess_stata date_assess
+	list in 1/5
+
+*Save & upload registration/deduction data ready to merge with primarycare events data
+save pc_regs_wide.dta, replace
+!dx upload pc_regs_wide.dta
