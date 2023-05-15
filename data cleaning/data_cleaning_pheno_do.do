@@ -131,3 +131,89 @@ save insomnia_pheno_cleaned.dta, replace
 
 *Upload to DNA Nexus repository
 !dx upload insomnia_pheno_cleaned.dta
+
+
+
+************************************************************************************************
+
+*Merge self-report pheno data with registration data (164,184 participants being included in our study)
+
+*Open registration data (master)
+set more off
+use /mnt/project/pc_regs_wide.dta, clear
+describe
+list in 1/1
+
+*Drop all variables except eid
+keep eid
+
+*Merge registration data (master) with phenotype data (using)
+
+merge 1:1 eid using /mnt/project/insomnia_pheno_cleaned.dta
+rename _merge _mergepheno_regs
+describe
+
+
+*Just keep those in registration dataset (master)
+keep if _mergepheno_regs == 3 //338,203 observations dropped. 
+describe // vars: 32. Observations: 164,184.
+drop _mergepheno_regs // Vars: 31
+
+*Save & Upload
+save pheno_primarycare.dta, replace
+!dx upload pheno_primarycare.dta
+
+
+***************************************************************************************************
+*Create variable in pheno data for primary health care insomnia cases by merging eids of those with an insomnia read code
+
+*Open primary care insomnia cases dataset (master)
+use /mnt/project/primarycare_insomnia_cases.dta, clear
+set more off
+describe // 125 vars
+
+ssc install unique
+unique eid //9862 unique eid. 17251 obs.
+
+*Drop all variables except eid
+keep eid
+describe // 71251 obs, 1 var.
+duplicates drop
+describe // 9862 obs, 1 var.
+unique eid //9862 unique eid.
+
+
+*Merge primary care insomnia cases (master) with phenotype dataset (using)
+merge 1:1 eid using /mnt/project/pheno_primarycare.dta
+rename _merge _mergepc_insomniacases
+
+*Result                           # of obs.
+*    -----------------------------------------
+*    not matched                       154,322
+*        from master                         0  (_merge==1)
+*        from using                    154,322  (_merge==2)
+*
+*    matched                             9,862  (_merge==3)
+*    -----------------------------------------
+
+*Generate indicator variable for primary care insomnia case
+generate pc_insomniacase =0
+	*Make it 1 if eid matches the primary care insomnia cases dataset 
+	replace pc_insomniacase =1 if _mergepc_insomniacases == 3
+	*Label the variable
+	label variable pc_insomniacase "Primary care insomnia case (has insomnia read code) 1=Yes 0=No."
+	*Label the variable values
+	label define pc_insomniacase_lb 1"Yes" 0"No"
+	label values pc_insomniacase pc_insomniacase_lb
+
+*Check looks ok
+tab pc_insomniacase, missing
+describe
+codebook pc_insomniacase
+
+unique eid if pc_insomniacase ==1 //9862
+unique eid if pc_insomniacase ==0 //154322
+
+*Save & Upload
+save pheno_primarycare.dta, replace
+!dx upload pheno_primarycare.dta
