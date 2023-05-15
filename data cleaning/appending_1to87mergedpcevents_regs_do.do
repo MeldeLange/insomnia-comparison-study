@@ -26,7 +26,7 @@ ssc install unique
 unique eid // obs: 33,064,673. Unique eids: 137,406.
 
 
-****We have 137,406 participants*****
+****We have 137,406 participants with valid events data.
 
 *See if there are observations / people registration dates but no primary care events (merge ==2 not matched (using (regs) only) or merge ==1 not matched (Master, events dataset only)).
 
