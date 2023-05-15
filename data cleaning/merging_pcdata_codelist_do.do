@@ -38,8 +38,8 @@ rename _merge _mergecodelist
 *Explore merged dataset
 ssc install unique
 unique eid if _mergecodelist==3 // 9862 eids have an insomnia code.
-*unique eid in primary care data = 137 406
-*7.2% of participants have an insomnia code.
+*unique eid in primary care registration data = 164,184
+*6% of participants have an insomnia code.
 
 *Save & upload
 save primarycare_codelist.dta, replace
