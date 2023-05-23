@@ -90,7 +90,7 @@ label variable smoking "smoking status (20116)"
 label variable risk "risk taking (2040)"
 label variable met_mins "total met mins/week for all activity (22040)"
 label variable coffee "coffee intake (cups per day) (1498)"
-label variable risk "tea intake (cups per day) (1488)"
+label variable tea "tea intake (cups per day) (1488)"
 
 *Check naming & labeling
 describe
@@ -123,8 +123,6 @@ tab insomnia, missing
 describe
 codebook insomnia_case
 
-
-*****************************************************************************************
 	
 *Save as different file name
 save insomnia_pheno_cleaned.dta, replace
@@ -217,3 +215,548 @@ unique eid if pc_insomniacase ==0 //154322
 *Save & Upload
 save pheno_primarycare.dta, replace
 !dx upload pheno_primarycare.dta
+
+
+********************************************************************************************
+********************************************************************************************
+
+*Cleaning self-report phenotype data
+**************************************
+**************************************
+*Open complete dataset
+use /mnt/project/pheno_primarycare.dta, clear
+set more off
+describe // 164,184 obs. 33 vars.
+list in 1/1
+
+*Rename self report insomnia_case variable to be consistent with primary care one. 
+rename insomnia_case sr_insomniacase
+describe
+
+*Recode N/A (-3) prefer not to answer or don't know (-1) in categorical variables to missing and add value labels (if not recoding the variable further).
+****************************************************************************************************************************
+
+tab sex, missing
+label define sex_lb 1"Male" 0"Female"
+label values sex sex_lb
+tab sex, missing
+
+tab income , missing
+recode income (-3 -1 =.)
+tab income , missing
+label define income_lb 1"<£18,000" 2 "£18,000-£30,999" 3 "£31,000-£51,999" 4 "£52,000-£100,000" 5 ">£100,000"
+label values income income_lb
+tab income , missing
+
+tab overall_health, missing
+recode overall_health (-3 -1 =.)
+tab overall_health, missing
+label define overall_health_lb 1 "Excellent" 2 "Good" 3 "Fair" 4 "Poor"
+label values overall_health overall_health_lb
+tab overall_health, missing
+
+tab worrier, missing
+recode worrier (-3 -1 =.)
+tab worrier, missing
+label define worrier_lb 1 "Yes" 0 "No"
+label values worrier worrier_lb
+tab worrier, missing
+
+tab depress, missing
+recode depress (-3 -1 =.)
+tab depress, missing
+label define depress_lb 1 "Not at all" 2 "Several days" 3 "More than half the days" 4 "Nearly every day"
+label values depress depress_lb
+tab depress, missing
+
+*Only people who do shift work were asked this question. Therfore we count anyone with missing data (.) (i.e. who wasn't asked the question) as a no (put in the"Never/rarely" category (1))
+tab night_shift, missing
+recode night_shift (. = 1)
+recode night_shift (-3 -1 =.)
+tab night_shift, missing
+label define night_shift_lb 1 "Never/rarely" 2 "Sometimes" 3 "Usually" 4 "Always"
+label values night_shift night_shift_lb
+tab night_shift, missing
+
+tab getting_up, missing
+recode getting_up (-3 -1 =.)
+tab getting_up, missing
+label define getting_up_lb 1 "Not at all easy" 2 "Not very easy" 3 "Fairly easy" 4 "Very easy"
+label values getting_up getting_up_lb
+tab getting_up, missing
+
+tab nap, missing
+recode nap (-3 =.)
+tab nap, missing
+label define nap_lb 1 "Never/rarely" 2 "Sometimes" 3 "Usually"
+label values nap nap_lb
+tab nap, missing
+
+tab day_dozing, missing
+recode day_dozing (-3 -1 =.)
+tab day_dozing, missing
+label define day_dozing_lb 0 "Never/rarely" 1 "Sometimes" 2 "Often" 3 "All of the time"
+label values day_dozing day_dozing_lb
+tab day_dozing, missing
+
+*Menopause - we are counting anyone who has had a hysterectomy (2) as a yes (have been through the menopause (1)). 
+*We are counting anyone who says not sure - other reason (3) as missing. Prefer not to answer (-3) set to missing.
+tab menopause, missing
+recode menopause (-3 =.)
+tab menopause, missing
+recode menopause (2 = 1)
+recode menopause (3=.)
+tab menopause, missing
+label define menopause_lb 1"Yes" 0"No"
+label values menopause menopause_lb
+tab menopause, missing
+
+tab alcohol, missing
+recode alcohol (-3 =.)
+tab alcohol, missing
+label define alcohol_lb 1 "Daily/almost daily" 2 "3-4 times a week" 3 "Once or twice a week" 4 "1-3 times a month" 5 "Special occasions only" 6 "Never"
+label values alcohol alcohol_lb
+tab alcohol, missing
+
+tab smoking, missing
+recode smoking (-3 =.)
+tab smoking, missing
+label define smoking_lb 0 "Never" 1 "Previous" 2 "Current"
+label values smoking smoking_lb
+tab smoking, missing
+
+tab risk, missing
+label variable risk "describe yourself someone as who takes risks binary?"
+recode risk (-3 -1 =.)
+tab risk, missing
+label define risk_lb 1"Yes" 0"No"
+label values risk risk_lb
+tab risk, missing
+
+
+tab sr_insomniacase, missing
+tab sr_insomniacase
+*28.91% of our sample self report having insomnia.
+
+tab pc_insomniacase, missing
+tab pc_insomniacase
+*6.01% of our sample have primary care read code for insomnia.
+
+
+******************************************************************************
+
+
+*Convert date of assessment centre from string to stata elapsed date format
+	generate date_assess_stata = date(date_assess, "YMD")
+	list eid date_assess date_assess_stata in 1/5
+	
+	*Make elapsed date readable
+	format date_assess_stata %d
+	list eid date_assess date_assess_stata in 1/5
+	
+	*Rename variable back to original name
+	drop date_assess
+	rename date_assess_stata date_assess
+	list in 1/5
+
+
+***Clean categorical variables that require more specific recoding
+******************************************************************
+
+*chrono
+*Recode chronotype so -1 = no preference
+tab chrono, missing
+recode chrono (-3 =.)
+tab chrono
+recode chrono (1=1) (2=2) (-1=3) (3=4) (4=5)
+tab chrono
+label define chrono_lb 1 "Definite morning" 2 "Morning more than evening" 3 "No preference" 4 "Evening more than morning" 5 "Definite evening"  
+label values chrono chrono_lb
+tab chrono, missing
+
+
+
+*pop_dens (recode to fewer categories). 1: All urban categories together, 2: all town categories together, 3: all village & hamlet categories together as rural.
+*We have some people who are living in Scotland (original categories 11, 12, 13, 16). They must have lived in England at some point as we have their English primary care records but by the time they go to the UKB assessment centre they have moved to Scotland. We have coded these people as missing just for this variable. 9 (postcode not linkable) is coded as missing
+tab pop_dens, missing
+recode pop_dens (9=.)
+tab pop_dens, missing
+recode pop_dens (1=1) (2=2) (3=3) (4=3) (5=1) (6=2) (7=3) (8=3) (11=.) (12=.) (13=.) (16=.)
+tab pop_dens, missing
+label define pop_dens_lb 1 "Urban" 2 "Town" 3 "Rural"
+label values pop_dens pop_dens_lb
+tab pop_dens, missing
+
+
+
+*ethnicity (recode into 6 top level categories)
+tab ethnicity, missing
+recode ethnicity (-3 -1 =.)
+tab ethnicity, missing
+recode ethnicity (1=1) (2=2) (3=3) (4=4) (5=5) (6=6) (1001=1) (1002=1) (1003=1) (2001=2) (2002=2) (2003=2) (2004=2)(3001=3) (3002=3) (3003=3) (3004=3) (4001=4) (4002=4) (4003=4)
+tab ethnicity
+label define ethnicity_lb 1 "White" 2 "Mixed" 3 "Asian/Asian British" 4 "Black/Black British" 5 "Chinese" 6 "Other"
+label values ethnic ethnicity_lb
+tab ethnicity
+
+
+********************************************************************************
+
+*Clean categorical variables with multiple answers that are string variables
+**********************************************************************
+
+*Qualifications
+tab quals, missing
+	*Generate new variable for highest qualification
+generate qual_highest = 0 //By coding this as 0 rather than it being quals it effectively destrings the variable.
+replace qual_highest =0 if quals == "-7"
+replace qual_highest =. if quals == "-3"
+replace qual_highest =. if quals == "" // Note: quals was a string variable so missing values weren't coded as .
+tab qual_highest, missing
+	
+replace qual_highest =1 if quals == "1"
+replace qual_highest =1 if quals == "1|2"
+replace qual_highest =1 if quals == "1|2|3"
+replace qual_highest =1 if quals == "1|2|3|4"
+replace qual_highest =1 if quals == "1|2|3|4|5"
+replace qual_highest =1 if quals == "1|2|3|4|5|6"
+replace qual_highest =1 if quals == "1|2|3|4|6"
+replace qual_highest =1 if quals == "1|2|3|5"
+replace qual_highest =1 if quals == "1|2|3|5|6"
+replace qual_highest =1 if quals == "1|2|3|6"
+replace qual_highest =1 if quals == "1|2|4"
+replace qual_highest =1 if quals == "1|2|4|5"
+replace qual_highest =1 if quals == "1|2|4|5|6"
+replace qual_highest =1 if quals == "1|2|4|6"
+replace qual_highest =1 if quals == "1|2|5"
+replace qual_highest =1 if quals == "1|2|5|6"
+replace qual_highest =1 if quals == "1|2|6"
+replace qual_highest =1 if quals == "1|3"
+replace qual_highest =1 if quals == "1|3|4"
+replace qual_highest =1 if quals == "1|3|4|5"
+replace qual_highest =1 if quals == "1|3|4|5|6"
+replace qual_highest =1 if quals == "1|3|4|6"
+replace qual_highest =1 if quals == "1|3|5"
+replace qual_highest =1 if quals == "1|3|5|6"
+replace qual_highest =1 if quals == "1|3|6"
+replace qual_highest =1 if quals == "1|4"
+replace qual_highest =1 if quals == "1|4|5"
+replace qual_highest =1 if quals == "1|4|5|6"
+replace qual_highest =1 if quals == "1|4|6"
+replace qual_highest =1 if quals == "1|5"
+replace qual_highest =1 if quals == "1|5|6"
+replace qual_highest =1 if quals == "1|6"
+replace qual_highest =2 if quals == "2"
+replace qual_highest =2 if quals == "2|3"
+replace qual_highest =2 if quals == "2|3|4"
+replace qual_highest =2 if quals == "2|3|4|5"
+replace qual_highest =2 if quals == "2|3|4|5|6"
+replace qual_highest =2 if quals == "2|3|4|6"
+replace qual_highest =2 if quals == "2|3|5"
+replace qual_highest =2 if quals == "2|3|5|6"
+replace qual_highest =2 if quals == "2|3|6"
+replace qual_highest =2 if quals == "2|4"
+replace qual_highest =2 if quals == "2|4|5"
+replace qual_highest =2 if quals == "2|4|5|6"
+replace qual_highest =2 if quals == "2|4|6"
+replace qual_highest =2 if quals == "2|5"
+replace qual_highest =2 if quals == "2|5|6"
+replace qual_highest =2 if quals == "2|6"
+replace qual_highest =3 if quals == "3"
+replace qual_highest =3 if quals == "3|4"
+replace qual_highest =3 if quals == "3|4|5"
+replace qual_highest =3 if quals == "3|4|5|6"
+replace qual_highest =3 if quals == "3|4|6"
+replace qual_highest =3 if quals == "3|5"
+replace qual_highest =3 if quals == "3|5|6"
+replace qual_highest =3 if quals == "3|6"
+replace qual_highest =4 if quals == "4"
+replace qual_highest =4 if quals == "4|5"
+replace qual_highest =4 if quals == "4|5|6"
+replace qual_highest =4 if quals == "4|6"
+replace qual_highest =5 if quals == "5"
+replace qual_highest =5 if quals == "5|6"
+replace qual_highest =6 if quals == "6"
+
+tab qual_highest, missing
+*qual_highest is now a float variable (no longer string)
+
+*Label the qual_highest variable
+label variable qual_highest "Highest qualification"
+
+
+		*Create value labels for qual_highest
+
+label define qual_highest_lb 0"None" 1"College/University degree" 2"A/AS levels or equivalent" 3"O levels/GCSEs or equivalent" 4"CSEs or equivalent" 5"NVQ/HND/HNC or equivalent" 6"Other professional qualifications" 
+label values qual_highest qual_highest_lb
+tab qual_highest, missing
+
+
+********************************************************************
+
+*employ
+
+*We are simplifying the categories for this to reduce it to 3 categories. Anyone that has a 1 at all (employed/self-employed) counts as employed (1), anyone who has a 2 at all counts as retired (2). If they don't have a 1 or a 2 (including -7 "none of the above") they are put in the 'other' category (3). Prefer not to answer (-3) is coded as missing.
+
+tab employ, missing
+	*Generate new variable for employ_3cats
+generate employ_3cats =0
+replace employ_3cats =3 if employ == "-7"
+replace employ_3cats =. if employ == "-3"
+replace employ_3cats =. if employ == "" 
+tab employ_3cats, missing
+
+replace employ_3cats =1 if employ== "1"
+replace employ_3cats =1 if employ == "1|2"
+replace employ_3cats =1 if employ == "1|2|3"
+replace employ_3cats =1 if employ == "1|2|3|4"
+replace employ_3cats =1 if employ == "1|2|3|4|5|6|7"
+replace employ_3cats =1 if employ == "1|2|3|4|6"
+replace employ_3cats =1 if employ == "1|2|3|6"
+replace employ_3cats =1 if employ == "1|2|3|6|7"
+replace employ_3cats =1 if employ == "1|2|3|7"
+replace employ_3cats =1 if employ == "1|2|4"
+replace employ_3cats =1 if employ == "1|2|4|6"
+replace employ_3cats =1 if employ == "1|2|4|7"
+replace employ_3cats =1 if employ == "1|2|5"
+replace employ_3cats =1 if employ == "1|2|6"
+replace employ_3cats =1 if employ == "1|2|6|7"
+replace employ_3cats =1 if employ == "1|2|7"
+replace employ_3cats =1 if employ == "1|3"
+replace employ_3cats =1 if employ == "1|3|4"
+replace employ_3cats =1 if employ == "1|3|4|6"
+replace employ_3cats =1 if employ == "1|3|5"
+replace employ_3cats =1 if employ == "1|3|5|6"
+replace employ_3cats =1 if employ == "1|3|6"
+replace employ_3cats =1 if employ == "1|3|6|7"
+replace employ_3cats =1 if employ == "1|3|7"
+replace employ_3cats =1 if employ == "1|4"
+replace employ_3cats =1 if employ == "1|4|5"
+replace employ_3cats =1 if employ == "1|4|6"
+replace employ_3cats =1 if employ == "1|4|7"
+replace employ_3cats =1 if employ == "1|5"
+replace employ_3cats =1 if employ == "1|5|6"
+replace employ_3cats =1 if employ == "1|5|7"
+replace employ_3cats =1 if employ == "1|6"
+replace employ_3cats =1 if employ == "1|6|7"
+replace employ_3cats =1 if employ == "1|7"
+replace employ_3cats =2 if employ == "2"
+replace employ_3cats =2 if employ == "2|3"
+replace employ_3cats =2 if employ == "2|3|4"
+replace employ_3cats =2 if employ == "2|3|4|5"
+replace employ_3cats =2 if employ == "2|3|4|5|6"
+replace employ_3cats =2 if employ == "2|3|4|6"
+replace employ_3cats =2 if employ == "2|3|4|6|7"
+replace employ_3cats =2 if employ == "2|3|5"
+replace employ_3cats =2 if employ == "2|3|5|6"
+replace employ_3cats =2 if employ == "2|3|6"
+replace employ_3cats =2 if employ == "2|3|6|7"
+replace employ_3cats =2 if employ == "2|3|7"
+replace employ_3cats =2 if employ == "2|4"
+replace employ_3cats =2 if employ == "2|4|5"
+replace employ_3cats =2 if employ == "2|4|5|6"
+replace employ_3cats =2 if employ == "2|4|6"
+replace employ_3cats =2 if employ == "2|4|6|7"
+replace employ_3cats =2 if employ == "2|4|7"
+replace employ_3cats =2 if employ == "2|5"
+replace employ_3cats =2 if employ == "2|5|6"
+replace employ_3cats =2 if employ == "2|5|7"
+replace employ_3cats =2 if employ == "2|6"
+replace employ_3cats =2 if employ == "2|6|7"
+replace employ_3cats =2 if employ == "2|7"
+replace employ_3cats =3 if employ == "3"
+replace employ_3cats =3 if employ == "3|4"
+replace employ_3cats =3 if employ == "3|4|5"
+replace employ_3cats =3 if employ == "3|4|5|7"
+replace employ_3cats =3 if employ == "3|4|6"
+replace employ_3cats =3 if employ == "3|4|6|7"
+replace employ_3cats =3 if employ == "3|5"
+replace employ_3cats =3 if employ == "3|5|6"
+replace employ_3cats =3 if employ == "3|5|6|7"
+replace employ_3cats =3 if employ == "3|5|7"
+replace employ_3cats =3 if employ == "3|6"
+replace employ_3cats =3 if employ == "3|6|7"
+replace employ_3cats =3 if employ == "3|7"
+replace employ_3cats =3 if employ == "4"
+replace employ_3cats =3 if employ == "4|5"
+replace employ_3cats =3 if employ == "4|5|6"
+replace employ_3cats =3 if employ == "4|5|7"
+replace employ_3cats =3 if employ == "4|6"
+replace employ_3cats =3 if employ == "4|6|7"
+replace employ_3cats =3 if employ == "4|7"
+replace employ_3cats =3 if employ == "5"
+replace employ_3cats =3 if employ == "5|6"
+replace employ_3cats =3 if employ == "5|6|7"
+replace employ_3cats =3 if employ == "5|7"
+replace employ_3cats =3 if employ == "6"
+replace employ_3cats =3 if employ == "6|7"
+replace employ_3cats =3 if employ == "7"
+
+tab employ_3cats, missing
+
+	*label the employ_3cats variable
+	label variable employ_3cats "Current employment status"
+
+
+		*Create value labels for employ_3cats
+
+label define employ_3cats_lb 1 "Paid employment/self-employed" 2 "Retired" 3 "Other"
+label values employ_3cats employ_3cats_lb
+tab employ_3cats, missing
+
+
+******************************************
+*household_relations
+tab household_relations, missing
+
+*We are simplifying the categories for this to reduce it to a binary variable. Anyone who is living with a husband/wife/patner is coded as 1. Everyone else is coded as 0. Prefer not to answer (-3) is coded as missing.
+
+
+	*Generate new variable for house_rels_binary
+generate house_rels_binary =0
+replace house_rels_binary=. if household_relations == "-3"
+replace house_rels_binary =. if household_relations == "" 
+tab house_rels_binary, missing
+
+replace house_rels_binary =1 if household_relations== "1"
+replace house_rels_binary =1 if household_relations== "1|2"
+replace house_rels_binary =1 if household_relations== "1|2|3"
+replace house_rels_binary =1 if household_relations== "1|2|3|4"
+replace house_rels_binary =1 if household_relations== "1|2|3|4|5"
+replace house_rels_binary =1 if household_relations== "1|2|3|4|7"
+replace house_rels_binary =1 if household_relations== "1|2|3|5"
+replace house_rels_binary =1 if household_relations== "1|2|3|7"
+replace house_rels_binary =1 if household_relations== "1|2|4"
+replace house_rels_binary =1 if household_relations== "1|2|4|5"
+replace house_rels_binary =1 if household_relations== "1|2|4|6"
+replace house_rels_binary =1 if household_relations== "1|2|4|6|7"
+replace house_rels_binary =1 if household_relations== "1|2|4|7"
+replace house_rels_binary =1 if household_relations== "1|2|4|8"
+replace house_rels_binary =1 if household_relations== "1|2|5"
+replace house_rels_binary =1 if household_relations== "1|2|6"
+replace house_rels_binary =1 if household_relations== "1|2|6|7"
+replace house_rels_binary =1 if household_relations== "1|2|6|8"
+replace house_rels_binary =1 if household_relations== "1|2|7"
+replace house_rels_binary =1 if household_relations== "1|2|7|8"
+replace house_rels_binary =1 if household_relations== "1|2|8"
+replace house_rels_binary =1 if household_relations== "1|3"
+replace house_rels_binary =1 if household_relations== "1|3|4"
+replace house_rels_binary =1 if household_relations== "1|3|4|7"
+replace house_rels_binary =1 if household_relations== "1|3|6"
+replace house_rels_binary =1 if household_relations== "1|3|7"
+replace house_rels_binary =1 if household_relations== "1|3|8"
+replace house_rels_binary =1 if household_relations== "1|4"
+replace house_rels_binary =1 if household_relations== "1|4|8"
+replace house_rels_binary =1 if household_relations== "1|5"
+replace house_rels_binary =1 if household_relations== "1|6"
+replace house_rels_binary =1 if household_relations== "1|6|7"
+replace house_rels_binary =1 if household_relations== "1|6|8"
+replace house_rels_binary =1 if household_relations== "1|7"
+replace house_rels_binary =1 if household_relations== "1|7|8"
+replace house_rels_binary =1 if household_relations== "1|8"
+
+tab house_rels_binary, missing
+
+*Label house_rels_binary variablew
+label variable house_rels_binary "Live with spouse/partner (yes/no)"
+
+		*Create value labels for house_rels_binary
+
+label define house_rels_binary_lb 1 "Yes" 0"No"
+label values house_rels_binary house_rels_binary_lb
+tab house_rels_binary, missing
+
+
+
+*********************************************************************************
+
+*Explore continuous/discrete variables treated as continuous
+***********************************************************
+
+
+**Continuous
+
+*depriv
+summarize depriv
+histogram depriv //Not normally distributed. (right/positive skew = tail to the right)
+inspect depriv
+summarize depriv, detail // Median: 13.59. 25% 7.85. 75% 23.85.
+
+*bmi
+summarize bmi
+histogram bmi // Not normally distributed. (slight right/positive skew)
+inspect bmi
+summarize bmi, detail // Median: 26.83. 25% 24.22. 75% 30.00
+
+
+**Discrete 
+
+*age_assess
+rename age_asess age_assess
+summarize age_assess
+histogram age_assess // Not normally distributed. (left/negative skew = tail to the left)
+inspect age_assess
+summarize age_assess, detail // Median: 58. 25%: 50. 75%: 63.
+
+
+*sleep_dur
+tab sleep_dur, missing
+recode sleep_dur (-3 -1 =.)
+tab sleep_dur, missing
+summarize sleep_dur //Min = 1 hour. Max = 23 hours!
+histogram sleep_dur // Not normally distributed. (right/positive skew = tail to the right) 
+inspect sleep_dur
+summarize sleep_dur, detail
+	*Remove extreme values of sleep duration (>18 hours & <3) as per this paper https://link.springer.com/article/10.1007/s10654-023-00981-x which says "Extreme responses of less than 3 h or more than 18 h were excluded to avoid improbable short or long sleep durations confounded by poor health."
+replace sleep_dur =. if sleep_dur >18
+replace sleep_dur =. if sleep_dur <3
+tab sleep_dur, missing
+
+*household no
+tab household_no, missing
+recode household_no (-3 -1 =.)
+tab household_no, missing
+summarize household_no // min 1. max 57!
+histogram household_no // not normally distributed (right/positive skew)
+inspect household_no
+summarize household_no, detail // Median:2. 25%:2. 75%:3.
+
+*met_mins
+summarize met_mins
+histogram met_mins //not normally distributed (right/positive skew)
+inspect met_mins
+summarize met_mins, detail // Median: 1815. 25%: 813. 75%:3679.
+
+*coffee
+tab coffee
+recode coffee (-3 -1 =.)
+recode coffee (-10 =0) //-10 is less than 1 cup.
+tab coffee
+summarize coffee // min:0. max: 60.
+histogram coffee // not normally distributed (right/positive skew)
+inspect coffee
+summarize coffee, detail //Median: 3. 25%:0. 75%:3.
+
+*tea
+tab tea
+label variable tea "tea intake (cups per day)"
+recode tea (-3 -1 =.)
+recode tea (-10 =0) //-10 is less than 1 cup.
+tab tea
+summarize tea // min: 0. Max:81.
+histogram tea // not normally distributed (right/positive skew)
+inspect tea
+summarize tea, detail // Median: 3. 25%:1. 75%5. 
+
+*Check dataset looks ok
+describe
+*obs: 164,184. vars: 36.
+
+
+*Save & Upload
+save pheno_primarycare2.dta, replace
+!dx upload pheno_primarycare2.dta
+
+
+
+
