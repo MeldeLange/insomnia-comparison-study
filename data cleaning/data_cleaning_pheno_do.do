@@ -758,5 +758,67 @@ save pheno_primarycare2.dta, replace
 !dx upload pheno_primarycare2.dta
 
 
+*****************************************************************************
+
+*Add snoring variable to dataset
+************************************
 
 
+*Import snoring csv file
+import delimited /mnt/project/snoring.csv, clear
+describe
+list in 1/5
+
+*rename & label snoring variable
+rename v2 snoring
+tab snoring, missing
+recode snoring (-3 -1 =.)
+label variable snoring "Snore (1210)"
+label define snoring_lb 1 "Yes" 2 "No"
+label values snoring snoring_lb
+tab snoring, missing
+
+
+*Save phenotype data as stata .dta file
+save snoring
+
+*Upload saved .dta file to project in DNA Nexus
+!dx upload snoring.dta
+
+
+********************************************************************************
+***Need to go out of JupyterLab and then back in again to use .dta file saved in DNA Nexus project
+
+**Merge snoring data with main dataset
+*Open primary/phenotype main dataset (use as master)
+set more off
+use /mnt/project/pheno_primarycare2.dta, clear
+describe
+
+
+*Merge main dataset (master) with snoring data (using)
+
+merge 1:1 eid using /mnt/project/snoring.dta
+*Result                           # of obs.
+*    -----------------------------------------
+*    not matched                       338,203
+*        from master                         0  (_merge==1)
+*        from using                    338,203  (_merge==2)
+*
+*    matched                           164,184  (_merge==3)
+*    -----------------------------------------
+
+
+rename _merge _merge_snoring
+describe
+
+
+*Just keep those in registration dataset (master)
+drop if _merge_snoring ==2 //drop if observation appeared in snoring (using) dataset only.
+describe //164,184 obs. 38 vars
+drop _merge_snoring
+describe //164,184 obs. 37 vars.
+
+*Save & upload
+save pheno_primarycare3.dta, replace
+!dx upload pheno_primarycare3.dta
