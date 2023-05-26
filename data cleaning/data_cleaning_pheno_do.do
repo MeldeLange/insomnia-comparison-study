@@ -822,3 +822,33 @@ describe //164,184 obs. 37 vars.
 *Save & upload
 save pheno_primarycare3.dta, replace
 !dx upload pheno_primarycare3.dta
+
+
+**************************************************************************************
+
+*Insomnia: Split continuous/discrete variables into catorical variables (quartiles)
+
+
+*Open main dataset
+set more off
+use /mnt/project/pheno_primarycare3.dta, clear
+describe
+
+*Sleep duration recode into 4 categories
+*Sleep foundation: 
+*adults aged 26-64: 7-9 hours = recommended. (Less than 6 hours / > 10 hours not recommended.)
+*adults aged >=65 7-8 hours = recommended. (Less than 5 hours / >9 hours not recommended.)
+*Therefore in both age categories >=7 hours is recommended.
+tab sleep_dur, missing
+recode sleep_dur (3 4 =1) (5 6 = 2) (7 8 = 3) (9 10 11 12 13 14 15 16 17 18 = 4), generate (sleep_dur_cats) 
+tab sleep_dur_cats, missing
+tab sleep_dur_cats
+
+*Save & upload
+save pheno_primarycare4.dta, replace
+!dx upload pheno_primarycare4.dta
+
+
+
+
+
