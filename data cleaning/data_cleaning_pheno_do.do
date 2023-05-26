@@ -843,12 +843,14 @@ tab sleep_dur, missing
 recode sleep_dur (3 4 =1) (5 6 = 2) (7 8 = 3) (9 10 11 12 13 14 15 16 17 18 = 4), generate (sleep_dur_cats) 
 tab sleep_dur_cats, missing
 tab sleep_dur_cats
+label define sleep_dur_cats_lb 1"3-4 hours" 2"5-6 hours" 3"7-8 hours" 4 "9 or more hours"
+label values sleep_dur_cats sleep_dur_cats_lb
+tab sleep_dur_cats, missing
+
 
 *Save & upload
 save pheno_primarycare4.dta, replace
 !dx upload pheno_primarycare4.dta
-
-
 
 
 
