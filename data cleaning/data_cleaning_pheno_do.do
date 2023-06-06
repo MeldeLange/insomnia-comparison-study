@@ -977,3 +977,23 @@ describe
 save pheno_primarycare5.dta, replace
 !dx upload pheno_primarycare5.dta
 
+******************************************
+
+
+*Recode snoring variable so that 0 = negative & 1 = positive so that it can be used in table 1.
+
+*Open main dataset
+set more off
+use /mnt/project/pheno_primarycare5.dta, clear
+
+
+tab snoring
+recode snoring (2=0)
+label define snoring_lb 1 "Yes" 0 "No", modify
+tab snoring, missing
+tab snoring, nolab
+
+
+*Save & upload
+save pheno_primarycare6.dta, replace
+!dx upload pheno_primarycare6.dta
