@@ -826,7 +826,7 @@ save pheno_primarycare3.dta, replace
 
 **************************************************************************************
 
-*Insomnia: Split continuous/discrete variables into catorical variables (quartiles)
+*Split continuous/discrete variables into catorical variables (quartiles)
 
 
 *Open main dataset
@@ -839,6 +839,7 @@ describe
 *adults aged 26-64: 7-9 hours = recommended. (Less than 6 hours / > 10 hours not recommended.)
 *adults aged >=65 7-8 hours = recommended. (Less than 5 hours / >9 hours not recommended.)
 *Therefore in both age categories >=7 hours is recommended.
+*Becky's paper uses 3 categories: 6 or less, 7-8 and 9 or more.
 tab sleep_dur, missing
 recode sleep_dur (3 4 =1) (5 6 = 2) (7 8 = 3) (9 10 11 12 13 14 15 16 17 18 = 4), generate (sleep_dur_cats) 
 tab sleep_dur_cats, missing
@@ -846,11 +847,133 @@ tab sleep_dur_cats
 label define sleep_dur_cats_lb 1"3-4 hours" 2"5-6 hours" 3"7-8 hours" 4 "9 or more hours"
 label values sleep_dur_cats sleep_dur_cats_lb
 tab sleep_dur_cats, missing
-
+tab sleep_dur_cats
 
 *Save & upload
 save pheno_primarycare4.dta, replace
 !dx upload pheno_primarycare4.dta
 
 
+*********************************************************************
+************************************************************************
+
+
+*Continue recoding continuous/discrete variables to categorical
+
+*Open main dataset
+set more off
+use /mnt/project/pheno_primarycare4.dta, clear
+describe
+
+
+*BMI: recode into underweight, normal, overweight, obese categories
+summarize bmi, detail
+generate bmi_cat =.
+replace bmi_cat = 1 if bmi <18.5
+replace bmi_cat = 2 if bmi >=18.5 & bmi <25
+replace bmi_cat = 3 if bmi >=25 & bmi <30
+replace bmi_cat = 4 if bmi >=30 & bmi <.
+
+label define bmi_cat_lb 1 "Underweight" 2"Healthy weight" 3"Overweight" 4"Obese"
+label values bmi_cat bmi_cat_lb
+tab bmi_cat, missing
+tab bmi_cat
+
+*Tea intake: recode into 4 categories: 0-2, 3-5, 6-8, 9+ cups per day.
+tab tea, missing
+generate tea_cat =.
+replace tea_cat = 1 if tea <=2
+replace tea_cat = 2 if tea >=3 & tea <6
+replace tea_cat = 3 if tea >=6 & tea <9
+replace tea_cat = 4 if tea >=9 & tea <.
+
+label define tea_cat_lb 1 "0-2 cups/day" 2 "3-5 cups/day" 3 "6-8 cups/day" 4 "9 or more cups/day"
+label values tea_cat tea_cat_lb
+tab tea_cat, missing
+tab tea_cat
+
+*Coffee intake: recode into 4 categories: 0-1, 2-3, 4-5, 6+ cups per day.
+tab coffee, missing
+generate coffee_cat =.
+replace coffee_cat = 1 if coffee <2
+replace coffee_cat = 2 if coffee >=2 & coffee <4
+replace coffee_cat = 3 if coffee >=4 & coffee <6
+replace coffee_cat = 4 if coffee >=6 & coffee <.
+
+label define coffee_cat_lb 1 "0-1 cups/day" 2 "2-3 cups/day" 3 "4-5 cups/day" 4 "6 or more cups/day"
+label values coffee_cat coffee_cat_lb
+tab coffee_cat, missing
+tab coffee_cat
+
+
+*Household size: recode to 4 categories: 1, 2, 3-5, 6+
+tab household_no, missing
+generate household_no_cat =.
+replace household_no_cat = 1 if household_no == 1
+replace household_no_cat = 2 if household_no == 2
+replace household_no_cat = 3 if household_no >=3 & household_no <6
+replace household_no_cat = 4 if household_no >=6 & household_no <.
+
+
+label define household_no_cat_lb 1 "1 person" 2 "2 people" 3 "3-5 people" 4 "6 or more people"
+label values household_no_cat household_no_cat_lb
+tab household_no_cat, missing
+tab household_no_cat
+
+*Age at assessment centre: 4 categories <45, 45-54, 55-64, 65+
+summarize age_assess, detail
+generate age_assess_cat =.
+replace age_assess_cat = 1 if age_assess <45
+replace age_assess_cat = 2 if age_assess >=45 & age_assess <55
+replace age_assess_cat = 3 if age_assess >=55 & age_assess <65
+replace age_assess_cat = 4 if age_assess >=65 & age_assess <.
+
+label define age_asess_cat_lb 1 "Under 45" 2 "45-54" 3 "55-64" 4 "65 or over"
+label values age_assess_cat age_asess_cat_lb
+tab age_assess_cat, missing
+tab age_assess_cat
+
+*Deprivation: split into quartiles using xtile
+*DNA Nexus has version 16 of stata. Code to find version of stata you're using: display c(version).
+
+summarize depriv, detail 
+xtile depriv_quart = depriv, nq(4)
+tab depriv_quart
+version 16: table depriv_quart, contents(min depriv max depriv)
+
+*------------------------------------
+*4         |
+*quantiles |
+*of depriv | min(depriv)  max(depriv)
+*----------+-------------------------
+*        1 |         .76         7.85
+*        2 |        7.86        13.59
+*        3 |        13.6        23.85
+*        4 |       23.86        81.59
+*------------------------------------
+
+*Met minutes/week: split into quartiles using xtile
+
+xtile met_mins_quart = met_mins, nq(4)
+tab met_mins_quart
+version 16: table met_mins_quart, contents(min met_mins max met_mins)
+
+*----------------------------------------
+*4         |
+*quantiles |
+*of        |
+*met_mins  | min(met_mins)  max(met_mins)
+*----------+-----------------------------
+*        1 |             0            813
+*        2 |           815           1815
+*        3 |        1816.8           3679
+*        4 |        3679.2          19278
+*----------------------------------------
+
+*Check dataset
+describe
+
+*Save & upload
+save pheno_primarycare5.dta, replace
+!dx upload pheno_primarycare5.dta
 
