@@ -7,3 +7,4 @@
 
 *analysis_insomnia_usual_vs_sometimes
 *analysis_table1_do
+*analysis_stratificationtable
