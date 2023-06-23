@@ -997,3 +997,22 @@ tab snoring, nolab
 *Save & upload
 save pheno_primarycare6.dta, replace
 !dx upload pheno_primarycare6.dta
+
+
+*********************************************
+
+*Open dataset
+set more off
+use /mnt/project/pheno_primarycare6.dta, clear
+describe
+
+*Remove anyone who is missing data for self-report insomnia. They are not included in the study.
+tab sr_insomniacase, missing //436 are missing data for SR insomnia
+drop if sr_insomniacase==. 
+tab sr_insomniacase, missing
+describe
+
+
+*Save & upload
+save pheno_primarycare6.dta, replace
+!dx upload pheno_primarycare6.dta
