@@ -1,6 +1,7 @@
 *Create coefficient plots of our stratification table
 ******************************************************
 
+*Excel spreadsheet downloaded from DNA Nexus and opened in Stata 17.
 
 *Set working directory
 cd "$analysisdir"
