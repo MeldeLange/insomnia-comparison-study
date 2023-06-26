@@ -1,7 +1,7 @@
 *Create coefficient plots of our stratification table
 ******************************************************
+*Excel spreadsheet downloaded from DNA Nexus & opened in Stata 17.
 
-*Excel spreadsheet downloaded from DNA Nexus and opened in Stata 17.
 
 *Set working directory
 cd "$analysisdir"
@@ -26,7 +26,7 @@ save "strat_table_combined.dta", replace
 *****************************************************************************************
 
 
-*Split data into 3 different matrices so that we have 3 separate graphs (109 categories is too much for one graph)
+*Split data into 3 different matrices so that we have 4 separate graphs (105 categories is too much for one graph)
 
 *Graph 1
 *********
@@ -69,8 +69,8 @@ graph export "coefplot_1.eps", replace
 
 use "strat_table_combined.dta", clear
 
-*Keep just observations 25-53.
-keep if _n >= 25 & _n <= 53
+*Keep just observations 25-51.
+keep if _n >= 25 & _n <= 51
 
 *Create Matrices
 
@@ -90,7 +90,7 @@ matrix list pc_prev
 	
 *Create combined plot with self-report & primary care prevalence offset.
 coefplot (matrix(self_prev) ,  se(2) msize(tiny) mc(edkblue) ciopts(lc(edkblue) lwidth(vthin)) offset(+0.15)) ///
-(matrix(pc_prev) ,  se(2) msize(tiny) ciopts(lwidth(vthin))), graphregion(color(white))  plotregion(lc(white)) grid(none) ylabel(,labsize(vsmall)) xlabel(,labsize(vsmall)) xtitle ("Insomnia prevalence", size(vsmall)) rescale(100) legend(order (4 2) label (2 "Self-reported") label (4 "Primary care") size(vsmall)) headings (Highest_Qual_None ="{bf:Highest Qualification}" Household_Size_1_Person="{bf:Household Size (People)}" Live_With_Spouse_Or_Partner_No="{bf:Live with Spouse/Partner}" Pop_Dens_Urban ="{bf:Population Density}" Primary_Care_Insomnia_Case_No ="{bf:Primary Care Insomnia Case}" Self-Reported_Insomnia_Case_No="{bf:Self-Reported Insomnia Case}" Sleep_Duration_3-4_Hours="{bf:Sleep Duration (Hours)}" Chrono_Def_Morn="{bf:Chronotype}", labsize(vsmall)) coeflabels(Highest_Qual_None="None" Highest_Qual_College_Uni="College/Uni Degree" Highest_Qual_A_AS_Equiv="A/AS Levels" Highest_Qual_O_GCSEs_Equiv="O Levels/GCSEs" Highest_Qual_CSEs_Equiv="CSEs" Highest_Qual_NVQ_HND_HNC_Equiv="NVQ/HND/HNC" Highest_Qual_Other_Prof="Other Professional" Household_Size_1_Person="1" Household_Size_2_People="2" Household_Size_3-5_People="3-5" Household_Size_6_Or_More_People="6+" Live_With_Spouse_Or_Partner_No="No" Live_With_Spouse_Or_Partner_Yes="Yes" Pop_Dens_Urban="Urban" Pop_Dens_Town="Town" Pop_Dens_Rural="Rural" Primary_Care_Insomnia_Case_No="No" Primary_Care_Insomnia_Case_Yes="Yes" Self-Reported_Insomnia_Case_No="No" Self-Reported_Insomnia_Case_Yes="Yes" Sleep_Duration_3-4_Hours="3-4" Sleep_Duration_5-6_Hours="5-6"Sleep_Duration_7-8_Hours="7-8" Sleep_Duration_9_Or_More_Hours="9+" Chrono_Def_Morn="Definite Morning" Chrono_Morn_More="Morning More Than Evening" Chrono_No_Pref="No Preference" Chrono_Eve_More="Evening More Than Morning" Chrono_Def_Eve="Definite Evening", labsize(vsmall)) 
+(matrix(pc_prev) ,  se(2) msize(tiny) ciopts(lwidth(vthin))), graphregion(color(white))  plotregion(lc(white)) grid(none) ylabel(,labsize(vsmall)) xlabel(,labsize(vsmall)) xtitle ("Insomnia prevalence", size(vsmall)) rescale(100) legend(order (4 2) label (2 "Self-reported") label (4 "Primary care") size(vsmall)) headings (Highest_Qual_None ="{bf:Highest Qualification}" Household_Size_1_Person="{bf:Household Size (People)}" Live_With_Spouse_Or_Partner_No="{bf:Live with Spouse/Partner}" Pop_Dens_Urban ="{bf:Population Density}"  Sleep_Duration_3-4_Hours="{bf:Sleep Duration (Hours)}" Chrono_Def_Morn="{bf:Chronotype}" Snore_No="{bf:Snore}", labsize(vsmall)) coeflabels(Highest_Qual_None="None" Highest_Qual_College_Uni="College/Uni Degree" Highest_Qual_A_AS_Equiv="A/AS Levels" Highest_Qual_O_GCSEs_Equiv="O Levels/GCSEs" Highest_Qual_CSEs_Equiv="CSEs" Highest_Qual_NVQ_HND_HNC_Equiv="NVQ/HND/HNC" Highest_Qual_Other_Prof="Other Professional" Household_Size_1_Person="1" Household_Size_2_People="2" Household_Size_3-5_People="3-5" Household_Size_6_Or_More_People="6+" Live_With_Spouse_Or_Partner_No="No" Live_With_Spouse_Or_Partner_Yes="Yes" Pop_Dens_Urban="Urban" Pop_Dens_Town="Town" Pop_Dens_Rural="Rural"  Sleep_Duration_3-4_Hours="3-4" Sleep_Duration_5-6_Hours="5-6"Sleep_Duration_7-8_Hours="7-8" Sleep_Duration_9_Or_More_Hours="9+" Chrono_Def_Morn="Definite Morning" Chrono_Morn_More="Morning More Than Evening" Chrono_No_Pref="No Preference" Chrono_Eve_More="Evening More Than Morning" Chrono_Def_Eve="Definite Evening" Snore_No="No" Snore_Yes="Yes", labsize(vsmall)) 
 
 *Save as stata graph, pdf, windows metafile & eps
 graph save "coefplot_2", replace
@@ -106,8 +106,8 @@ graph export "coefplot_2.eps", replace
 
 use "strat_table_combined.dta", clear
 
-*Keep just observations 25-53.
-keep if _n >= 54 & _n <= 82
+*Keep just observations 52-78
+keep if _n >= 52 & _n <= 78
 
 *Create Matrices
 
@@ -128,7 +128,7 @@ matrix list pc_prev
 	
 *Create combined plot with self-report & primary care prevalence offset.
 coefplot (matrix(self_prev) ,  se(2) msize(tiny) mc(edkblue) ciopts(lc(edkblue) lwidth(vthin)) offset(+0.15)) ///
-(matrix(pc_prev) ,  se(2) msize(tiny) ciopts(lwidth(vthin))), graphregion(color(white))  plotregion(lc(white)) grid(none) ylabel(,labsize(vsmall)) xlabel(,labsize(vsmall)) xtitle ("Insomnia prevalence", size(vsmall)) rescale(100) legend(order (4 2) label (2 "Self-reported") label (4 "Primary care") size(vsmall)) headings (Snore_No="{bf:Snore}" Doze_Never_Rarely="{bf:Doze/Fall Asleep During Day}" Nap_Day_Never_Rarely="{bf:Nap During The Day}" Getting_Up_Not_At_All_Easy="{bf:Getting Up In Morning}" Night_Shift_Never_Rarely="{bf:Night Shift}" MET_Mins_Q1="{bf:MET Mins/Week}" Coffee_Intake_0-1="{bf:Coffee Intake (Cups/Day)}" Tea_Intake_0-2="{bf:Tea Intake (Cups/Day)}", labsize(vsmall)) coeflabels(Snore_No="No" Snore_Yes="Yes" Doze_Never_Rarely="Never/Rarely" Doze_Sometimes="Sometimes" Doze_Often="Often" Doze_All_Of_The_Time="All Of The Time" Nap_Day_Never_Rarely="Never/Rarely" Nap_Day_Sometimes="Sometimes" Nap_Day_Usually="Usually" Getting_Up_Not_At_All_Easy="Not At All Easy" Getting_Up_Not_Very_Easy="Not Very Easy" Getting_Up_Fairly_Easy="Fairly Easy" Getting_Up_Very_Easy="Very Easy" Night_Shift_Never_Rarely="Never/Rarely" Night_Shift_Sometimes="Sometimes" Night_Shift_Usually="Usually" Night_Shift_Always="Always" MET_Mins_Q1="Quartile 1" MET_Mins_Q2="Quartile 2" MET_Mins_Q3="Quartile 3" MET_Mins_Q4="Quartile 4" Coffee_Intake_0-1="0-1" Coffee_Intake_2-3="2-3" Coffee_Intake__4-5="4-5" Coffee_Intake__6_Or_More="6+" Tea_Intake_0-2="0-2" Tea_Intake_3-5="3-5" Tea_Intake_6-8="6-8" Tea_Intake_9_Or_More="9+", labsize(vsmall)) 
+(matrix(pc_prev) ,  se(2) msize(tiny) ciopts(lwidth(vthin))), graphregion(color(white))  plotregion(lc(white)) grid(none) ylabel(,labsize(vsmall)) xlabel(,labsize(vsmall)) xtitle ("Insomnia prevalence", size(vsmall)) rescale(100) legend(order (4 2) label (2 "Self-reported") label (4 "Primary care") size(vsmall)) headings (Doze_Never_Rarely="{bf:Doze/Fall Asleep During Day}" Nap_Day_Never_Rarely="{bf:Nap During The Day}" Getting_Up_Not_At_All_Easy="{bf:Getting Up In Morning}" Night_Shift_Never_Rarely="{bf:Night Shift}" MET_Mins_Q1="{bf:MET Mins/Week}" Coffee_Intake_0-1="{bf:Coffee Intake (Cups/Day)}" Tea_Intake_0-2="{bf:Tea Intake (Cups/Day)}", labsize(vsmall)) coeflabels(Doze_Never_Rarely="Never/Rarely" Doze_Sometimes="Sometimes" Doze_Often="Often" Doze_All_Of_The_Time="All Of The Time" Nap_Day_Never_Rarely="Never/Rarely" Nap_Day_Sometimes="Sometimes" Nap_Day_Usually="Usually" Getting_Up_Not_At_All_Easy="Not At All Easy" Getting_Up_Not_Very_Easy="Not Very Easy" Getting_Up_Fairly_Easy="Fairly Easy" Getting_Up_Very_Easy="Very Easy" Night_Shift_Never_Rarely="Never/Rarely" Night_Shift_Sometimes="Sometimes" Night_Shift_Usually="Usually" Night_Shift_Always="Always" MET_Mins_Q1="Quartile 1" MET_Mins_Q2="Quartile 2" MET_Mins_Q3="Quartile 3" MET_Mins_Q4="Quartile 4" Coffee_Intake_0-1="0-1" Coffee_Intake_2-3="2-3" Coffee_Intake__4-5="4-5" Coffee_Intake__6_Or_More="6+" Tea_Intake_0-2="0-2" Tea_Intake_3-5="3-5" Tea_Intake_6-8="6-8" Tea_Intake_9_Or_More="9+", labsize(vsmall)) 
 
 
 *Save as stata graph, pdf, windows metafile & eps
@@ -144,8 +144,8 @@ graph export "coefplot_3.eps", replace
 
 use "strat_table_combined.dta", clear
 
-*Keep just observations 83-109
-keep if _n >= 83
+*Keep just observations 79-105
+keep if _n >= 79
 
 *Create Matrices
 
@@ -175,3 +175,4 @@ graph export "coefplot_4.pdf", as(pdf) replace
 graph export "coefplot_4.wmf", replace
 graph export "coefplot_4.eps", replace
 
+*******************************************************************************
