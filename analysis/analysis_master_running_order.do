@@ -9,3 +9,4 @@
 *analysis_table1_do
 *analysis_stratificationtable_combined
 *analysis_coefplots
+*analysis_tab_insomnia_cases
