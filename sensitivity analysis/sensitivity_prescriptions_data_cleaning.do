@@ -126,6 +126,8 @@ save primarycare_prescriptions3.dta, replace
 
 ************************************************************************
 
+************************************************************************
+
 *d) Cut down prescriptions dataset to people with an insomnia prescription code.
 ********************************************************************************
 
@@ -133,42 +135,36 @@ save primarycare_prescriptions3.dta, replace
 *Merge prescriptions dataset with prescriptions codelist. prescription data = master. codelist = using
 set more off
 use /mnt/project/primarycare_prescriptions3.dta, clear
-merge m:1 bnf_shortcode using /mnt/project/insomniaprescriptions_shortcodelist.dta
-
+merge m:1 bnf_shortcode using /mnt/project/hypnotics_codelist.dta
 
 *Result                           # of obs.
 *    -----------------------------------------
-*    not matched                    36,851,438
-*        from master                36,851,435  (_merge==1)
-*        from using                          3  (_merge==2)
+*    not matched                    38,682,265
+*        from master                38,682,265  (_merge==1)
+*        from using                          0  (_merge==2)
 *
-*    matched                         2,074,124  (_merge==3)
+*    matched                           243,294  (_merge==3)
 *    -----------------------------------------
 
 
 *Rename merge variable
-rename _merge _merge_prescriptcodelist
+rename _merge _merge_hypnoticscodelist
 
 *Explore merged datasets
-describe // obs: 38,925,562. Vars: 4. vars: eid, bnf_date, bnf_shortcode, _merge_prescriptcodelist
+describe // obs: 38,925,562. Vars: 4. vars: eid, bnf_date, bnf_shortcode, _merge_hypnoticscodelist
 ssc install unique
-unique eid if _merge_prescriptcodelist==3 // unique eids of people with insomnia prescriptions: 102,338 (records 2,074,124)
-**This is a higher number of our sample because the bnf codes are broad. We are only counting people who have a prescription within 90 days of an insomnia symptom as an insomnia symptom case.
+unique eid if _merge_hypnoticscodelist==3 // unique eids of people with insomnia prescriptions: 31,128 (records 243,294)
 
-*Identify insomnia prescription codes not found in our prescription data.
-list bnf_shortcode if _merge_prescriptcodelist==2 // 040600 =Drugs used in nausea & vertigo. 190400 =Single substances. 190700 = Base, diluent, suspending agents & stabilisers.
 
 *Only keep observations with bnf codes in our codelist - will give us list of observations with insomnia prescriptions.
-keep if _merge_prescriptcodelist ==3 // 36,851,438 obs deleted
-unique eid //unique eids: 102,338. Records: 2,074,124.
+keep if _merge_hypnoticscodelist ==3 // 38,682,265 obs deleted
+unique eid //unique eids: 31,128 Records: 243,294 
 
 *Drop variables we don't need: leaves us with eid and bnf_date (long format)
-drop bnf_shortcode _merge_prescriptcodelist
-describe // 2 vars: eid, bnf_date. obs: 2,074,124.
+drop bnf_shortcode _merge_hypnoticscodelist
+describe // 2 vars: eid, bnf_date. obs: 243,294
 
 *Save & upload: dataset of just observations with insomnia prescriptions in long format.
-save pc_prescription_cases.dta, replace // (15.85MiB)
+save pc_prescription_cases.dta, replace // 1.86MiB
 !dx upload pc_prescription_cases.dta
-
-
 
