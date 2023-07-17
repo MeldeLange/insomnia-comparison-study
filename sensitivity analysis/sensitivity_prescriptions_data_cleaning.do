@@ -14,7 +14,7 @@ set more off
 use /mnt/project/pheno_primarycare9.dta, clear // (18.04GiB)
 
 *Only keep the eid variable
-describe // obs: 173,748. vars: 50
+describe // obs: 163,748. vars: 50
 keep eid
 describe //vars: 1
 
