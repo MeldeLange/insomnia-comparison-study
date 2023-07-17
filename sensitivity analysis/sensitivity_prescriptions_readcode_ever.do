@@ -159,20 +159,6 @@ count if totaleligible==1 //8,059
 ssc install unique
 unique eid if totaleligible==1 //3,023 unique eids.
 
-***************
-*Checking total eligible flag code works
-generate totaleligible_check=0
-replace totaleligible_check=1 if eligible1==1 |eligible2==1 |eligible3==1 |eligible4==1 |eligible5==1 |eligible6==1 |eligible7==1 |eligible8==1 |eligible9==1 |eligible10==1 |eligible11==1 |eligible12==1 |eligible13==1 |eligible14==1 |eligible15==1 |eligible16==1 |eligible17==1 |eligible18==1 |eligible19==1 |eligible20==1 |eligible21==1 |eligible22==1 |eligible23==1 |eligible24==1 |eligible25==1 |eligible26==1 |eligible27==1 |eligible28==1 |eligible29==1 |eligible30==1 |eligible31==1 |eligible32==1 |eligible33==1 |eligible34==1 |eligible35==1 |eligible36==1|eligible37==1 |eligible38==1 |eligible39==1 |eligible40==1 |eligible41==1 |eligible42==1 |eligible43==1 |eligible44==1 |eligible45==1 |eligible46==1 |eligible47==1 |eligible48==1 |eligible49==1 |eligible50==1 |eligible51==1 // 18,786 changes made.
-
-*Explore those with a bnf date within 90 days of any read code event
-count if totaleligible_check==1  //18,786
-ssc install unique
-unique eid if totaleligible_check==1 //obs: 18,786. Unique eid: 4,767.
-
-*Yes code above works correctly.
-drop totaleligible_check
-
-****************
 
 *Only keep those who have a bnf date within 90 days of any read code event
 keep if totaleligible==1 //69,775 obs deleted
