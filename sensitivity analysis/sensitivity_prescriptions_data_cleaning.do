@@ -110,7 +110,7 @@ unique eid if _merge_studysample==3 // unique eids matched: 157,600 (records 38,
 unique eid if _merge_studysample==2 // unique eids of people in our study without prescriptions: 6148
 unique eid if _merge_studysample==1 // unique eids of people with prescriptions but not in our study: 27,141 (records 4,835,280)
 
-*Only keep observations with eids in our study sample
+*Only keep observations with eids in our study & a prescription
 keep if _merge_studysample ==3 //4,841,428 obs deleted
 unique eid // unique eids: 157,600. records: 38,925,559
 
