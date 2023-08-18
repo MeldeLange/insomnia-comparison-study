@@ -10,5 +10,6 @@
 *sensitivity_prescriptions_readcode_ever
 *sensitivity_prescriptions_readcode12mths
 *sensitivity_prescriptions_readcode4wks
+*sensitivity_prescriptions_only
 
 
