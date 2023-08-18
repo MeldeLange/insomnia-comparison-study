@@ -8,5 +8,7 @@
 *sensitivity_4weeks_12months.do
 *sensitivity_prescriptions_data_cleaning.do
 *sensitivity_prescriptions_readcode_ever
+*sensitivity_prescriptions_readcode12mths
+*sensitivity_prescriptions_readcode4wks
 
 
