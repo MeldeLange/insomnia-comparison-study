@@ -9,6 +9,9 @@ Results: We found that 29% of the sample self-reported having insomnia symptoms,
 
 Conclusions: Only a small proportion of individuals experiencing insomnia symptoms present to primary care. However, the sociodemographic characteristics of people attending primary care with insomnia were consistent with those with self-reported insomnia, thus primary care records are a valuable data source for studying risk factors for insomnia.
 
+# Using this code
+Analyses were performed in Stata version 16 via JupyterLab in DNA Nexus.
+
 # Availability of data
 The UK Biobank dataset used to conduct the research in this research is available via application directly to the UK Biobank. Applications are assessed for meeting the required criteria for access, including legal and ethics standards. More information regarding data access can be found at https://www.ukbiobank.ac.uk/enable-your-research. 
 
